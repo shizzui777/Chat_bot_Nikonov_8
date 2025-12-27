@@ -4,10 +4,10 @@ import spacy
 
 app = Flask(__name__)
 
-# Загружаем русскую модель spaCy
-nlp = spacy.load("ru_core_news_sm")
+# Загружаем легкую мульти-языковую модель spaCy
+nlp = spacy.load("xx_ent_wiki_sm")
 
-#Клавиатуры
+# Клавиатуры
 def main_menu_keyboard():
     return [
         [{"text": "Проблемы со входом"}],
@@ -52,18 +52,16 @@ def support_keyboard():
 def back_keyboard():
     return [[{"text": "Назад"}]]
 
-#Продвинутый Fallback
+# Продвинутый Fallback
 def analyze_fallback(message):
     doc = nlp(message.lower())
-    tokens = [token.lemma_ for token in doc]  # Лемматизация для улучшения поиска
+    tokens = [token.lemma_ for token in doc]
 
-    # Словари для семантической классификации
     login_words = {"вход", "логин", "пароль", "не могу войти", "login", "signin"}
     error_words = {"ошибка", "не работает", "зависает", "не открывается", "error", "fail"}
     faq_words = {"инструкция", "как", "помощь", "что делать", "faq"}
     support_words = {"поддержка", "связаться", "оператор", "заявка", "contact"}
 
-    # Проверка токенов по словарям
     if any(token in login_words for token in tokens):
         return "login_problem", "Похоже, у вас проблема со входом. Выберите из меню:", login_problem_keyboard()
     elif any(token in error_words for token in tokens):
@@ -75,7 +73,7 @@ def analyze_fallback(message):
     else:
         return "unknown", "Извините, я пока не знаю, как ответить на это. Попробуйте переформулировать вопрос.", None
 
-#Основной маршрут webhook
+# Основной маршрут webhook
 @app.route('/webhook', methods=['POST'])
 def webhook():
     req = request.get_json(force=True)
@@ -85,7 +83,7 @@ def webhook():
     payload = None
     response_text = "Извините, я пока не знаю, как ответить на это."
 
-    #Главное меню
+    # Главное меню
     if intent in ["Greeting", "Go_Back"]:
         payload = {
             "telegram": {
@@ -99,7 +97,7 @@ def webhook():
         }
         response_text = "Главное меню:"
 
-    #Частые вопросы
+    # Частые вопросы
     elif intent == "Частые_вопросы":
         payload = {
             "telegram": {
@@ -113,7 +111,7 @@ def webhook():
         }
         response_text = "Выберите категорию:"
 
-    #Проблемы со входом
+    # Проблемы со входом
     elif intent == "Проблемы_со_входом":
         payload = {
             "telegram": {
@@ -127,7 +125,7 @@ def webhook():
         }
         response_text = "Выберите проблему со входом:"
 
-    #Ошибка в работе
+    # Ошибка в работе
     elif intent == "Ошибка_в_работе":
         payload = {
             "telegram": {
@@ -141,7 +139,7 @@ def webhook():
         }
         response_text = "Выберите тип ошибки:"
 
-    #Связаться с поддержкой
+    # Связаться с поддержкой
     elif intent == "Связаться_с_поддержкой":
         payload = {
             "telegram": {
@@ -155,7 +153,7 @@ def webhook():
         }
         response_text = "Выберите способ связи:"
 
-    #Подменю
+    # Подменю
     elif intent == "Забыл_пароль":
         payload = {
             "telegram": {
@@ -195,7 +193,7 @@ def webhook():
         }
         response_text = "Аккаунт заблокирован:"
 
-    #Продвинутый Fallback
+    # Продвинутый Fallback
     else:
         intent_name, response_text, kb = analyze_fallback(user_message)
         if kb:
@@ -210,7 +208,6 @@ def webhook():
                 }
             }
 
-    #Отправка ответа
     if payload:
         return jsonify({
             "fulfillmentText": response_text,
@@ -221,10 +218,11 @@ def webhook():
             "fulfillmentText": response_text
         })
 
-#Запуск сервера
+# Запуск сервера
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
