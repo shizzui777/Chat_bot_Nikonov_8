@@ -31,3 +31,4 @@ EXPOSE 10000
 # Запуск через gunicorn
 CMD gunicorn app:app --bind 0.0.0.0:$PORT
 
+
