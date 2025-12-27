@@ -97,7 +97,6 @@ def webhook():
         }
         response_text = "Главное меню:"
 
-    # Частые вопросы
     elif intent == "Частые_вопросы":
         payload = {
             "telegram": {
@@ -111,7 +110,6 @@ def webhook():
         }
         response_text = "Выберите категорию:"
 
-    # Проблемы со входом
     elif intent == "Проблемы_со_входом":
         payload = {
             "telegram": {
@@ -125,7 +123,6 @@ def webhook():
         }
         response_text = "Выберите проблему со входом:"
 
-    # Ошибка в работе
     elif intent == "Ошибка_в_работе":
         payload = {
             "telegram": {
@@ -139,7 +136,6 @@ def webhook():
         }
         response_text = "Выберите тип ошибки:"
 
-    # Связаться с поддержкой
     elif intent == "Связаться_с_поддержкой":
         payload = {
             "telegram": {
@@ -153,7 +149,6 @@ def webhook():
         }
         response_text = "Выберите способ связи:"
 
-    # Подменю
     elif intent == "Забыл_пароль":
         payload = {
             "telegram": {
@@ -193,7 +188,6 @@ def webhook():
         }
         response_text = "Аккаунт заблокирован:"
 
-    # Продвинутый Fallback
     else:
         intent_name, response_text, kb = analyze_fallback(user_message)
         if kb:
@@ -218,12 +212,6 @@ def webhook():
             "fulfillmentText": response_text
         })
 
-# Запуск сервера
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
-
-
-
-
