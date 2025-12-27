@@ -10,7 +10,7 @@ WORKDIR /app
 # Копируем requirements
 COPY requirements.txt .
 
-# Обновляем pip и устанавливаем зависимости + модель spaCy
+# Обновляем pip и ставим зависимости + модель spaCy
 RUN pip install --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
@@ -20,8 +20,11 @@ COPY . .
 # Открываем порт (Render подставит свой)
 EXPOSE 10000
 
-# Запуск через Gunicorn
-CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:$PORT"]
+# Запуск через Gunicorn с автоматической подстановкой $PORT
+# Shell-формат CMD позволяет использовать переменные окружения
+CMD gunicorn app:app --bind 0.0.0.0:$PORT
+
+
 
 
 
