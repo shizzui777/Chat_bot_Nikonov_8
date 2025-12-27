@@ -6,7 +6,3 @@ requests==2.32.5
 click==8.3.1
 # Лёгкая мульти-языковая модель spaCy
 https://github.com/explosion/spacy-models/releases/download/xx_ent_wiki_sm-3.7.0/xx_ent_wiki_sm-3.7.0-py3-none-any.whl
-
-
-
-
