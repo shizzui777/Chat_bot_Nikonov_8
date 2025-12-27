@@ -4,10 +4,18 @@ import spacy
 
 app = Flask(__name__)
 
-# Загружаем легкую мульти-языковую модель spaCy
+# Загружаем лёгкую мульти-языковую модель spaCy
 nlp = spacy.load("xx_ent_wiki_sm")
 
+# Health Check
+
+@app.route("/healthz", methods=["GET"])
+def health():
+    return "OK", 200
+
+# ----------------------
 # Клавиатуры
+# ----------------------
 def main_menu_keyboard():
     return [
         [{"text": "Проблемы со входом"}],
@@ -52,7 +60,9 @@ def support_keyboard():
 def back_keyboard():
     return [[{"text": "Назад"}]]
 
+
 # Продвинутый Fallback
+
 def analyze_fallback(message):
     doc = nlp(message.lower())
     tokens = [token.lemma_ for token in doc]
@@ -73,7 +83,9 @@ def analyze_fallback(message):
     else:
         return "unknown", "Извините, я пока не знаю, как ответить на это. Попробуйте переформулировать вопрос.", None
 
-# Основной маршрут webhook
+
+# Основной webhook
+
 @app.route('/webhook', methods=['POST'])
 def webhook():
     req = request.get_json(force=True)
@@ -83,135 +95,55 @@ def webhook():
     payload = None
     response_text = "Извините, я пока не знаю, как ответить на это."
 
-    # Главное меню
     if intent in ["Greeting", "Go_Back"]:
-        payload = {
-            "telegram": {
-                "text": "Главное меню:",
-                "reply_markup": {
-                    "keyboard": main_menu_keyboard(),
-                    "one_time_keyboard": True,
-                    "resize_keyboard": True
-                }
-            }
-        }
+        payload = {"telegram": {"text": "Главное меню:", "reply_markup": {"keyboard": main_menu_keyboard(), "one_time_keyboard": True, "resize_keyboard": True}}}
         response_text = "Главное меню:"
 
     elif intent == "Частые_вопросы":
-        payload = {
-            "telegram": {
-                "text": "Выберите категорию:",
-                "reply_markup": {
-                    "keyboard": faq_keyboard(),
-                    "one_time_keyboard": True,
-                    "resize_keyboard": True
-                }
-            }
-        }
+        payload = {"telegram": {"text": "Выберите категорию:", "reply_markup": {"keyboard": faq_keyboard(), "one_time_keyboard": True, "resize_keyboard": True}}}
         response_text = "Выберите категорию:"
 
     elif intent == "Проблемы_со_входом":
-        payload = {
-            "telegram": {
-                "text": "Выберите проблему со входом:",
-                "reply_markup": {
-                    "keyboard": login_problem_keyboard(),
-                    "one_time_keyboard": True,
-                    "resize_keyboard": True
-                }
-            }
-        }
+        payload = {"telegram": {"text": "Выберите проблему со входом:", "reply_markup": {"keyboard": login_problem_keyboard(), "one_time_keyboard": True, "resize_keyboard": True}}}
         response_text = "Выберите проблему со входом:"
 
     elif intent == "Ошибка_в_работе":
-        payload = {
-            "telegram": {
-                "text": "Выберите тип ошибки:",
-                "reply_markup": {
-                    "keyboard": service_error_keyboard(),
-                    "one_time_keyboard": True,
-                    "resize_keyboard": True
-                }
-            }
-        }
+        payload = {"telegram": {"text": "Выберите тип ошибки:", "reply_markup": {"keyboard": service_error_keyboard(), "one_time_keyboard": True, "resize_keyboard": True}}}
         response_text = "Выберите тип ошибки:"
 
     elif intent == "Связаться_с_поддержкой":
-        payload = {
-            "telegram": {
-                "text": "Выберите способ связи:",
-                "reply_markup": {
-                    "keyboard": support_keyboard(),
-                    "one_time_keyboard": True,
-                    "resize_keyboard": True
-                }
-            }
-        }
+        payload = {"telegram": {"text": "Выберите способ связи:", "reply_markup": {"keyboard": support_keyboard(), "one_time_keyboard": True, "resize_keyboard": True}}}
         response_text = "Выберите способ связи:"
 
     elif intent == "Забыл_пароль":
-        payload = {
-            "telegram": {
-                "text": "Чтобы восстановить пароль, воспользуйтесь ссылкой 'Забыли пароль?' или обратитесь в поддержку.",
-                "reply_markup": {
-                    "keyboard": back_keyboard(),
-                    "one_time_keyboard": True,
-                    "resize_keyboard": True
-                }
-            }
-        }
+        payload = {"telegram": {"text": "Чтобы восстановить пароль, воспользуйтесь ссылкой 'Забыли пароль?' или обратитесь в поддержку.", "reply_markup": {"keyboard": back_keyboard(), "one_time_keyboard": True, "resize_keyboard": True}}}
         response_text = "Инструкция по восстановлению пароля:"
 
     elif intent == "Ошибка_входа":
-        payload = {
-            "telegram": {
-                "text": "Ошибка входа может быть вызвана некорректным логином или паролем. Проверьте данные и попробуйте снова.",
-                "reply_markup": {
-                    "keyboard": back_keyboard(),
-                    "one_time_keyboard": True,
-                    "resize_keyboard": True
-                }
-            }
-        }
+        payload = {"telegram": {"text": "Ошибка входа может быть вызвана некорректным логином или паролем. Проверьте данные и попробуйте снова.", "reply_markup": {"keyboard": back_keyboard(), "one_time_keyboard": True, "resize_keyboard": True}}}
         response_text = "Ошибка входа:"
 
     elif intent == "Аккаунт_заблокирован":
-        payload = {
-            "telegram": {
-                "text": "Ваш аккаунт заблокирован. Свяжитесь с поддержкой для разблокировки.",
-                "reply_markup": {
-                    "keyboard": back_keyboard(),
-                    "one_time_keyboard": True,
-                    "resize_keyboard": True
-                }
-            }
-        }
+        payload = {"telegram": {"text": "Ваш аккаунт заблокирован. Свяжитесь с поддержкой для разблокировки.", "reply_markup": {"keyboard": back_keyboard(), "one_time_keyboard": True, "resize_keyboard": True}}}
         response_text = "Аккаунт заблокирован:"
 
     else:
         intent_name, response_text, kb = analyze_fallback(user_message)
         if kb:
-            payload = {
-                "telegram": {
-                    "text": response_text,
-                    "reply_markup": {
-                        "keyboard": kb,
-                        "one_time_keyboard": True,
-                        "resize_keyboard": True
-                    }
-                }
-            }
+            payload = {"telegram": {"text": response_text, "reply_markup": {"keyboard": kb, "one_time_keyboard": True, "resize_keyboard": True}}}
 
     if payload:
-        return jsonify({
-            "fulfillmentText": response_text,
-            "payload": payload
-        })
+        return jsonify({"fulfillmentText": response_text, "payload": payload})
     else:
-        return jsonify({
-            "fulfillmentText": response_text
-        })
+        return jsonify({"fulfillmentText": response_text})
+
+
+# Запуск сервера
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
+
+
+
